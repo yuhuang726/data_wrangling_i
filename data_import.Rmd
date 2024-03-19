@@ -8,6 +8,8 @@ install.packages("skimr")
 
 ```{r setup}
 library(tidyverse)
+library(readxl)
+library(haven)
 ```
 
 ## Read in some data
@@ -58,4 +60,25 @@ litters_df = read_csv("data/FAS_litters.csv", na = c("", "NA", ".", 999))
 
 na = c("", "NA", ".", 999)): when r see these four will treat them as missing value.
 
+## Other file formats
+
+Read in an excel file.
+
+```{r}
+mlb_df = read_excel("data/mlb11.xlsx")
+mlb_df
+```
+?read_excel
+
+
+mlb_df = read_excel("data/mlb11.xlsx", range = "A1:F7")
+
+sheet = : import specific sheet
+range = : import specific range, from column a to b
+
+Read in a sas file.
+```{r}
+pulse_df = read_sas("data/public_pulse_data.sas7bdat")
+pulse_df
+```
 
