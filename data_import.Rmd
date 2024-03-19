@@ -1,0 +1,47 @@
+---
+title: "Data Import"
+output: github_document
+---
+
+install.packages("janitor")
+install.packages("skimr")
+
+```{r setup}
+library(tidyverse)
+```
+
+## Read in some data
+
+Read in the litters dataset.
+clean_names function is in the package "janitor". Since we did not library it, so we use "janitor::" to get the function. You can also library it at the beginning.
+ckean_names: change blank into _ in the columns' names.
+
+```{r}
+litters_df = read_csv("data/FAS_litters.csv")
+litters_df = janitor::clean_names(litters_df)
+```
+
+## Take a look at the data
+
+printing in the console
+
+```{r}
+litters_df
+```
+
+```{r}
+head(litters_df)
+tail(litters_df)
+```
+
+skim can give you missing value number, min, max, mean, p25, p75, small histogram (but prof dosen't use it frequently, he prefer view).
+view will open up a new window to show full dataset. But that will make Knit difficult so usually avoid using it in code chunk in R markdown.
+
+view(litters_df)
+
+```{r}
+skimr::skim(litters_df)
+```
+
+
+
