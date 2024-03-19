@@ -43,5 +43,19 @@ view(litters_df)
 skimr::skim(litters_df)
 ```
 
+?read_csv
+
+## Options to read_csv
+
+Check out `?read_csv()` for more information.
+
+litters_df = read_csv("data/FAS_litters.csv", skip = 10, col_names = FALSE)
+
+skip = 10: skip the first 10 rows
+col_name = FALSE: the first row is not columns' name and R will name them as X1 to Xn
+
+litters_df = read_csv("data/FAS_litters.csv", na = c("", "NA", ".", 999))
+
+na = c("", "NA", ".", 999)): when r see these four will treat them as missing value.
 
 
