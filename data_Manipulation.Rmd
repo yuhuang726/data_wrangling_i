@@ -58,5 +58,39 @@ select(litters_df, litter_number, everything())
 relocate(litters_df, litter_number)
 ```
 
+## `filter`
 
+choose rows
+
+```{r}
+filter(litters_df, gd0_weight < 22)
+```
+
+```{r}
+filter(litters_df, gd0_weight >= 22)
+```
+
+== is a test to equality
+```{r}
+filter(litters_df, gd_of_birth == 20)
+```
+
+not equal 
+```{r}
+filter(litters_df, !(gd_of_birth == 20))
+filter(litters_df, gd_of_birth != 20)
+```
+
+```{r}
+filter(litters_df, gd0_weight >= 22, gd_of_birth == 20)
+```
+
+```{r}
+filter(litters_df, group == "Mod8")
+```
+
+choose in either group
+```{r}
+filter(litters_df, group %in% c("Con7","Mod8"))
+```
 
