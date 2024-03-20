@@ -94,3 +94,17 @@ choose in either group
 filter(litters_df, group %in% c("Con7","Mod8"))
 ```
 
+## `mutate`
+
+change existing variable and create new variable
+
+create a new variable wt_gain
+change group to lowercase
+```{r}
+mutate(
+  litters_df,
+  wt_gain = gd18_weight - gd0_weight,
+  group = str_to_lower(group)
+)
+```
+
