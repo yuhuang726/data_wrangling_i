@@ -1,0 +1,238 @@
+---
+title: "Visualization"
+subtitle: "Part 1"
+output: github_document
+---
+
+
+install.packages("ggridges")
+
+install.packages(c('crul', 'XML', 'gridExtra', 'isdparser', 'geonames', 'hoardr'))
+install.packages("~/Downloads/rnoaa_1.4.0.tar.gz", repos = NULL, type = "source")
+
+
+```{r setup}
+library(tidyverse)
+library(ggridges)
+```
+
+
+## Load the weather data
+
+```{r}
+weather_df = 
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728", "USW00022534", "USS0023B17S"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2021-01-01",
+    date_max = "2022-12-31") %>% 
+  mutate(
+    name = recode(
+      id, 
+      USW00094728 = "CentralPark_NY", 
+      USW00022534 = "Molokai_HI",
+      USS0023B17S = "Waterhole_WA"),
+    tmin = tmin / 10,
+    tmax = tmax / 10)  %>% 
+  select(name, id, everything())
+```
+
+-metep_pull_monitors: pull data from open resources
+
+
+## Scatterplots
+
+Create my first scatterplot ever
+
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax)) + 
+  geom_point()
+```
+
+-aes: stands for "aesthetics" and is used to specify the mapping of variables in your data to visual properties (aesthetics) of the plot. This includes properties like x and y coordinates, colors, shapes, sizes, etc.
+
+-geom_point():adds a geometric layer to your plot. In this case, geom_point creates a scatter plot .
+
+New approach, same plot.
+
+```{r}
+weather_df %>%
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point()
+```
+
+Save and edit a plot object.
+
+```{r}
+weather_plot = 
+  weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax))
+
+weather_plot + geom_point()
+```
+
+## Advanced scatterplot
+
+Start with the same one and make it fancy!
+```{r}
+weather_df %>%
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+```
+
+-color points according the name.
+-geom_smooth(se = FALSE): add smooth curve.
+-se = FALSE: Disables the display of the confidence interval. By default, geom_smooth shows a 95% confidence interval around the smooth curve.
+
+What about the aes placement ?
+```{r}
+weather_df %>%
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(aes(color = name)) +
+  geom_smooth()
+```
+
+- color only applied to the points and not include geom_smooth.
+
+Let's facet some things!
+
+```{r}
+weather_df %>%
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point(alpha = .2, size = .3) +
+  geom_smooth(se = FALSE) +
+  facet_grid(. ~ name)
+```
+
+-ggplot(aes(x = tmin, alpha = tmin, y = tmax, color = name)): points transparency will change based on tmin
+-geom_point(alpha = .2, size = .3): make points 20% transparency, size to .3
+-facet_grid(. ~ name): don't create rows, but create columns that describe names: three panel plots
+-facet_grid(name ~ .): create rows (three panel plots according to names), but not columns
+
+
+Let's combine some elements and try a new plot.
+
+```{r}
+weather_df %>% 
+  ggplot(aes(x = date, y = tmax, color = name)) +
+  geom_point(aes(size = prcp), alpha = .5) +
+  geom_smooth(se = FALSE) +
+  facet_grid(. ~ name)
+```
+-aes(size = prcp): point size shows the prcp(precipitation).
+
+
+
+## Some small notes
+
+How many geoms have to exist?
+
+You can have whatever geoms you want.
+
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_smooth(se = FALSE)
+```
+
+You can use a neat geom!
+
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_hex()
+```
+
+-geom_hex: give us 2D plot(hexagrams). When sample size is large, this helps is to understand the distribution of the data. 
+
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_bin2d()
+```
+
+-geom_bin2d: You can also use geom_bin2d, which is in square.
+
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_density2d() +
+  geom_point(alpha = .3)
+```
+
+geom_density2d: like a contour plot
+
+
+## Univariate plots
+
+Histograms are really great.
+
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin)) +
+  geom_histogram()
+```
+
+Can we add color
+
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_histogram(position = "dodge")
+```
+
+-position = "dodge":it separates the bars for different groups so that they do not overlap but are placed next to each other. 
+-fill = name: fill the color in the bar (color = name just color the outside of the bar)
+
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_histogram() +
+  facet_grid(. ~ name)
+```
+
+-facet_grid(. ~ name): create three panel plots separately
+
+Let's try a new geometry!
+
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_density(alpha = .3, adjust = .5)
+```
+
+geom_density: density curve
+adjust = .5: adjusts the bandwidth of the density estimate.Give you more information about the change of the trend(more bumps).
+
+What about box plots?
+
+```{r}
+weather_df %>% 
+  ggplot(aes(x = name, y = tmin)) +
+  geom_boxplot()
+```
+
+Trendy plots :-)
+
+```{r}
+weather_df %>%
+  ggplot(aes(x = name, y = tmin, fill = name)) +
+  geom_violin(alpha = .5) +
+  stat_summary(fun = "median")
+```
+
+-geom_violin: violin plot, might be more informative (more distribution shape) than box plot
+-stat_summary(fun = "median"): show the median
+
+
+Ridge plots -- the most popular plot of 2017
+
+```{r}
+weather_df %>%
+  ggplot(aes(x = tmin, y = name)) +
+  geom_density_ridges()
+```
+geom_density_ridges: Ridge plots are used to visualize the distribution of a numeric variable for several groups. Each group’s distribution is displayed as a density plot, and the plots are stacked vertically.
+
+
