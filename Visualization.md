@@ -399,3 +399,46 @@ weather_df %>%
 geom_density_ridges: Ridge plots are used to visualize the distribution
 of a numeric variable for several groups. Each group’s distribution is
 displayed as a density plot, and the plots are stacked vertically.
+
+## Save and Embed
+
+Let’s save a scatterplot.
+
+``` r
+weather_plot = 
+  weather_df %>%
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point(alpha = .5)
+
+ggsave("weather_plot.png", weather_plot, width = 8, height = 5)
+```
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+-ggsave:save the plot. You can save png or pdf or others
+
+What about embedding
+
+``` r
+weather_plot
+```
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Visualization_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+
+Embed at different size.
+
+``` r
+weather_plot
+```
+
+    ## Warning: Removed 17 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Visualization_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+
+embed: inclusion of R code and its output (such as plots, tables, or
+text) within a document
