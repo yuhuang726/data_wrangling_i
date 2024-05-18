@@ -1,7 +1,7 @@
 Visualization
 ================
 
-install.packages(“patchwork”)
+install.packages(“patchwork”) install.packages(“viridis”)
 
 ``` r
 library(tidyverse)
@@ -108,3 +108,87 @@ weather_df %>%
     ## (`geom_point()`).
 
 ![](Visualization-II_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+## Scale
+
+Start with the same plot; x and y scales
+
+``` r
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point(alpha = .5) +
+  labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maximum daily temperature (C)",
+    caption = "Data from rnoaa package; temperatures in 2021 to 2023"
+  ) +
+  scale_x_continuous(
+    breaks = c(-15, 0, 15),
+    labels = c("-15 C", "0", "15 C")
+  ) +
+  scale_y_continuous(
+    position = "right"
+  )
+```
+
+    ## Warning: Removed 19 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Visualization-II_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+-scale_x_continuous: change x axis labels -scale_y_continuous: change y
+axis labels -trans = “sqrt”:square root transformation, you can also do
+trans = “log” - position = “right”: put y labels on the right side
+
+Look at color scales
+
+``` r
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point(alpha = .5) +
+  labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maximum daily temperature (C)",
+    caption = "Data from rnoaa package; temperatures in 2021 to 2023"
+  ) +
+  scale_color_hue(
+    name = "Location",
+    h = c(150,260))
+```
+
+    ## Warning: Removed 19 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Visualization-II_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+-scale_color_hue:map the color aesthetic to hues in the HCL
+(hue-chroma-luminance) color space. -h = c(10, 260): Specifies the range
+of hues to be used. The hue is an angle in the color wheel, with values
+ranging from 0 to 360.
+
+``` r
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point(alpha = .5) +
+  labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maximum daily temperature (C)",
+    caption = "Data from rnoaa package; temperatures in 2021 to 2023"
+  ) +
+ viridis::scale_color_viridis(
+   name = "Location",
+   discrete = TRUE
+ )
+```
+
+    ## Warning: Removed 19 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Visualization-II_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+viridis::scale_color_viridis: give different color to locations discrete
+= TRUE: viridis default thinks scales are continue so here need to tell
+R that scale is discrete.
