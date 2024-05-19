@@ -300,3 +300,91 @@ ggplot(data = moloka, aes(x = date, y = tmax, color = name)) +
 
 Apply different geom to different datasets. If I delete the data =
 central_park, geom_line will apply to moloka.
+
+## ‘patchwork’
+
+remember faceting?
+
+``` r
+weather_df %>% 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_density(alpha = .5) +
+  facet_grid(. ~ name)
+```
+
+    ## Warning: Removed 19 rows containing non-finite outside the scale range
+    ## (`stat_density()`).
+
+![](Visualization-II_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+what happens when you want multipanel plots but can’t facet?
+
+``` r
+tmax_tmin_p =
+  weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point(alpha = .5) +
+  theme(legend.position = "none")
+
+prcp_dens_p = 
+  weather_df %>% 
+  filter(prcp >0) %>% 
+  ggplot(aes(x = prcp, fill = name)) +
+  geom_density(alpha = .5)
+
+tmax_date_p = 
+  weather_df %>% 
+  ggplot(aes(x = date, y = tmax, color = name)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  theme(legend.position = "none")
+
+tmax_tmin_p + prcp_dens_p + tmax_date_p
+```
+
+    ## Warning: Removed 19 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+    ## `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'
+
+    ## Warning: Removed 19 rows containing non-finite outside the scale range
+    ## (`stat_smooth()`).
+    ## Removed 19 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Visualization-II_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+``` r
+tmax_tmin_p / (prcp_dens_p + tmax_date_p)
+```
+
+    ## Warning: Removed 19 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+    ## `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'
+
+    ## Warning: Removed 19 rows containing non-finite outside the scale range
+    ## (`stat_smooth()`).
+    ## Removed 19 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Visualization-II_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
+
+``` r
+(tmax_tmin_p + prcp_dens_p) / tmax_date_p
+```
+
+    ## Warning: Removed 19 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+    ## `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'
+
+    ## Warning: Removed 19 rows containing non-finite outside the scale range
+    ## (`stat_smooth()`).
+    ## Removed 19 rows containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](Visualization-II_files/figure-gfm/unnamed-chunk-13-3.png)<!-- -->
+
+tmax_tmin_p + prcp_dens_p + tmax_date_p: put three plots together
+tmax_tmin_p / (prcp_dens_p + tmax_date_p): change the position of plots
