@@ -261,3 +261,92 @@ weather_df %>%
     ##            name cold not cold emptystring_
     ##  CentralPark_NY  111      984            0
     ##    Waterhole_WA  473      604           18
+
+## General summaries
+
+You can do lots of summaries
+
+``` r
+weather_df %>% 
+  group_by(name, month) %>% 
+  summarize(
+    mean_tmax = mean(tmax, na.rm = TRUE),
+    mean_prcp = mean(prcp, na.rm = TRUE),
+    median_tmin = median(tmin, na.rm = TRUE)
+  )
+```
+
+    ## `summarise()` has grouped output by 'name'. You can override using the
+    ## `.groups` argument.
+
+    ## # A tibble: 108 × 5
+    ## # Groups:   name [3]
+    ##    name           month      mean_tmax mean_prcp median_tmin
+    ##    <chr>          <date>         <dbl>     <dbl>       <dbl>
+    ##  1 CentralPark_NY 2021-01-01      4.27      18.9       -0.5 
+    ##  2 CentralPark_NY 2021-02-01      3.87      46.6       -1.85
+    ##  3 CentralPark_NY 2021-03-01     12.3       28.0        5   
+    ##  4 CentralPark_NY 2021-04-01     17.6       22.8        8.05
+    ##  5 CentralPark_NY 2021-05-01     22.1       35.7       11.1 
+    ##  6 CentralPark_NY 2021-06-01     28.1       22.2       18.0 
+    ##  7 CentralPark_NY 2021-07-01     28.4       90.9       21.1 
+    ##  8 CentralPark_NY 2021-08-01     28.8       84.5       22.2 
+    ##  9 CentralPark_NY 2021-09-01     24.8       84.9       17.5 
+    ## 10 CentralPark_NY 2021-10-01     19.9       43.1       13.9 
+    ## # ℹ 98 more rows
+
+na.rm = TRUE: TRUE or FALSE indicating whether NA values should be
+stripped before the computation proceeds.
+
+This is a dataframe!
+
+``` r
+weather_df |>
+  group_by(name, month) |>
+  summarize(mean_tmax = mean(tmax, na.rm = TRUE)) |>
+  ggplot(aes(x = month, y = mean_tmax, color = name)) + 
+    geom_point() + geom_line() + 
+    theme(legend.position = "bottom")
+```
+
+Suppose you want to summarize many columns.
+
+``` r
+weather_df %>% 
+  group_by(name, month) %>% 
+  summarize(across(prcp:tmin, mean))
+```
+
+    ## `summarise()` has grouped output by 'name'. You can override using the
+    ## `.groups` argument.
+
+    ## # A tibble: 108 × 5
+    ## # Groups:   name [3]
+    ##    name           month       prcp  tmax  tmin
+    ##    <chr>          <date>     <dbl> <dbl> <dbl>
+    ##  1 CentralPark_NY 2021-01-01  18.9  4.27 -1.15
+    ##  2 CentralPark_NY 2021-02-01  46.6  3.87 -1.39
+    ##  3 CentralPark_NY 2021-03-01  28.0 12.3   3.1 
+    ##  4 CentralPark_NY 2021-04-01  22.8 17.6   7.48
+    ##  5 CentralPark_NY 2021-05-01  35.7 22.1  12.2 
+    ##  6 CentralPark_NY 2021-06-01  22.2 28.1  18.9 
+    ##  7 CentralPark_NY 2021-07-01  90.9 28.4  20.6 
+    ##  8 CentralPark_NY 2021-08-01  84.5 28.8  21.8 
+    ##  9 CentralPark_NY 2021-09-01  84.9 24.8  17.8 
+    ## 10 CentralPark_NY 2021-10-01  43.1 19.9  13.4 
+    ## # ℹ 98 more rows
+
+across(prcp:tmin, mean): calculate the mean from prcp to tmin
+
+Reminder: sometimes your results are easier to read in another format.
+
+``` r
+weather_df %>% 
+  group_by(name, month) %>% 
+  summarize(mean_tmax = mean(tmax)) %>% 
+  pivot_wider(
+    names_from = "name",
+    values_from = mean_tmax
+  ) %>% 
+  knitr::kable(digits = 1)
+```
