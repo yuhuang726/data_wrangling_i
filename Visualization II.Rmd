@@ -122,3 +122,77 @@ weather_df %>%
 
 viridis::scale_color_viridis: give different color to locations
 discrete = TRUE: viridis default thinks scales are continue so here need to tell R that scale is discrete.
+
+
+## Themes
+
+Shift the legend
+
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point(alpha = .5) +
+  labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maximum daily temperature (C)",
+    caption = "Data from rnoaa package; temperatures in 2021 to 2023"
+  ) +
+ viridis::scale_color_viridis(
+   name = "Location",
+   discrete = TRUE) +
+  theme(legend.position = "bottom")
+```
+
+legend.position = "bottom": shift the legend from side to the bottom
+
+Change the overall theme
+```{r}
+weather_df %>% 
+  ggplot(aes(x = tmin, y = tmax, color = name)) +
+  geom_point(alpha = .5) +
+  labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maximum daily temperature (C)",
+    caption = "Data from rnoaa package; temperatures in 2021 to 2023"
+  ) +
+ viridis::scale_color_viridis(
+   name = "Location",
+   discrete = TRUE) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+theme_minimal: change the background into white, and without the box. 
+theme_bw():change the background into white
+theme_classic():white background and no gridlines
+ggthemes::theme_economist: there are many other theme in ggthemes
+
+
+## Setting options
+
+```{r, eval = FALSE}
+library(tidyverse)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.color = "viridis",
+  ggplots.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_color_viridis_d
+scale_fill_continuous = scale_fill_viridis_d
+```
+
+eval = FALSE: code within the block will not be executed.
+If I have this in my very first code chunk in the markdown document, this will load tidyverse and update the theme everywhere.
+from options ... scale_fill_viridis_d: make sure plots use the virtus color palette
+Put this in your Rmarkdown file and unit the theme of plots.
