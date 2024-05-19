@@ -196,3 +196,23 @@ eval = FALSE: code within the block will not be executed.
 If I have this in my very first code chunk in the markdown document, this will load tidyverse and update the theme everywhere.
 from options ... scale_fill_viridis_d: make sure plots use the virtus color palette
 Put this in your Rmarkdown file and unit the theme of plots.
+
+
+## Data args in 'geom'
+```{r}
+central_park =
+  weather_df %>%
+  filter(name == "CentralPark_NY")
+
+moloka =
+  weather_df %>%
+  filter(name == "Molokai_HI")
+
+ggplot(data = moloka, aes(x = date, y = tmax, color = name)) +
+  geom_point() +
+  geom_line(data = central_park)
+```
+
+Apply different geom to different datasets.
+If I delete the data = central_park, geom_line will apply to moloka.
+
