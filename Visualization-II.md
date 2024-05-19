@@ -388,3 +388,44 @@ tmax_tmin_p / (prcp_dens_p + tmax_date_p)
 
 tmax_tmin_p + prcp_dens_p + tmax_date_p: put three plots together
 tmax_tmin_p / (prcp_dens_p + tmax_date_p): change the position of plots
+
+## Data manipulation
+
+Control your factors
+
+``` r
+weather_df %>% 
+  mutate(
+    name = factor(name),
+    name = forcats::fct_relevel(name, c("Molokai_HI"))
+  ) %>% 
+  ggplot(aes(x = name, y = tmax, fill = name)) +
+  geom_violin(alpha = .5)
+```
+
+    ## Warning: Removed 19 rows containing non-finite outside the scale range
+    ## (`stat_ydensity()`).
+
+![](Visualization-II_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+name = factor(name): change name from character to factor(categorical
+data). name = forcats::fct_relevel(name, c(“Molokai_HI”)): number the
+Molokai as the first and others stay the same.
+
+What if I wanted densities for tmin and tmax simultaneously?
+
+``` r
+weather_df %>% 
+  pivot_longer(
+    tmax:tmin,
+    names_to = "observation",
+    values_to = "temperature"
+  ) %>% 
+  ggplot(aes(x = temperature, fill = observation)) +
+  geom_density(alpha = .5) +
+  facet_grid(. ~ name)
+```
+
+    ## Warning: Removed 38 rows containing non-finite outside the scale range
+    ## (`stat_density()`).
+
+![](Visualization-II_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
