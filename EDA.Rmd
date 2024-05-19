@@ -3,8 +3,9 @@ title: "Exploratory Data Analysis"
 output: github_document
 ---
 
-install.packages("patchwork")
-install.packages("viridis")
+```{r}
+library("dplyr")
+```
 
 ## Setting options
 
@@ -102,3 +103,35 @@ weather_df %>%
 ```
 
 n_distince(date): count the number of distinct observations.e.g. in 2021-01-01, how many distinct days in this month (31).
+
+
+## A digression on 2*2 table
+
+```{r}
+weather_df %>% 
+  filter(name !="Molokai_HI") %>% 
+  mutate(
+    cold = case_when(
+      tmax <  5 ~ "cold",
+      tmax >= 5 ~ "not cold",
+      TRUE      ~ ""
+    )
+  ) %>% 
+  group_by(name, cold) %>% 
+  summarize(count = n())
+```
+
+case_when: given this condition use this output level
+
+```{r}
+weather_df %>% 
+  filter(name !="Molokai_HI") %>% 
+  mutate(
+    cold = case_when(
+      tmax <  5 ~ "cold",
+      tmax >= 5 ~ "not cold",
+      TRUE      ~ ""
+    )
+  ) %>% 
+  janitor::tabyl(name, cold)
+```

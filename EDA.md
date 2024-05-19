@@ -1,0 +1,263 @@
+Exploratory Data Analysis
+================
+
+``` r
+library("dplyr")
+```
+
+    ## 
+    ## Attaching package: 'dplyr'
+
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     filter, lag
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
+
+## Setting options
+
+``` r
+library(tidyverse)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.color = "viridis",
+  ggplots.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_color_viridis_d
+scale_fill_continuous = scale_fill_viridis_d
+```
+
+## load the dataset
+
+``` r
+weather_df = 
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728", "USW00022534", "USS0023B17S"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2021-01-01",
+    date_max = "2023-12-31")  %>% 
+  mutate(
+    name = recode(
+      id, 
+      USW00094728 = "CentralPark_NY", 
+      USW00022534 = "Molokai_HI",
+      USS0023B17S = "Waterhole_WA"),
+    tmin = tmin / 10,
+    tmax = tmax / 10,
+    month = lubridate::floor_date(date, unit = "month")) %>%
+  select(name, id, everything())
+```
+
+    ## using cached file: /Users/yu/Library/Caches/org.R-project.R/R/rnoaa/noaa_ghcnd/USW00094728.dly
+
+    ## date created (size, mb): 2024-05-18 14:02:16.709216 (8.605)
+
+    ## file min/max dates: 1869-01-01 / 2024-05-31
+
+    ## using cached file: /Users/yu/Library/Caches/org.R-project.R/R/rnoaa/noaa_ghcnd/USW00022534.dly
+
+    ## date created (size, mb): 2024-05-18 14:02:38.87762 (3.896)
+
+    ## file min/max dates: 1949-10-01 / 2024-05-31
+
+    ## using cached file: /Users/yu/Library/Caches/org.R-project.R/R/rnoaa/noaa_ghcnd/USS0023B17S.dly
+
+    ## date created (size, mb): 2024-05-18 14:02:43.732044 (1.022)
+
+    ## file min/max dates: 1999-09-01 / 2024-05-31
+
+``` r
+weather_df
+```
+
+    ## # A tibble: 3,285 × 7
+    ##    name           id          date        prcp  tmax  tmin month     
+    ##    <chr>          <chr>       <date>     <dbl> <dbl> <dbl> <date>    
+    ##  1 CentralPark_NY USW00094728 2021-01-01   157   4.4   0.6 2021-01-01
+    ##  2 CentralPark_NY USW00094728 2021-01-02    13  10.6   2.2 2021-01-01
+    ##  3 CentralPark_NY USW00094728 2021-01-03    56   3.3   1.1 2021-01-01
+    ##  4 CentralPark_NY USW00094728 2021-01-04     5   6.1   1.7 2021-01-01
+    ##  5 CentralPark_NY USW00094728 2021-01-05     0   5.6   2.2 2021-01-01
+    ##  6 CentralPark_NY USW00094728 2021-01-06     0   5     1.1 2021-01-01
+    ##  7 CentralPark_NY USW00094728 2021-01-07     0   5    -1   2021-01-01
+    ##  8 CentralPark_NY USW00094728 2021-01-08     0   2.8  -2.7 2021-01-01
+    ##  9 CentralPark_NY USW00094728 2021-01-09     0   2.8  -4.3 2021-01-01
+    ## 10 CentralPark_NY USW00094728 2021-01-10     0   5    -1.6 2021-01-01
+    ## # ℹ 3,275 more rows
+
+month = lubridate::floor_date(date, unit = “month”)) : round date to the
+month
+
+## ‘group_by’
+
+``` r
+weather_df %>% 
+  group_by(name, month) %>% 
+  ungroup(month)
+```
+
+    ## # A tibble: 3,285 × 7
+    ## # Groups:   name [3]
+    ##    name           id          date        prcp  tmax  tmin month     
+    ##    <chr>          <chr>       <date>     <dbl> <dbl> <dbl> <date>    
+    ##  1 CentralPark_NY USW00094728 2021-01-01   157   4.4   0.6 2021-01-01
+    ##  2 CentralPark_NY USW00094728 2021-01-02    13  10.6   2.2 2021-01-01
+    ##  3 CentralPark_NY USW00094728 2021-01-03    56   3.3   1.1 2021-01-01
+    ##  4 CentralPark_NY USW00094728 2021-01-04     5   6.1   1.7 2021-01-01
+    ##  5 CentralPark_NY USW00094728 2021-01-05     0   5.6   2.2 2021-01-01
+    ##  6 CentralPark_NY USW00094728 2021-01-06     0   5     1.1 2021-01-01
+    ##  7 CentralPark_NY USW00094728 2021-01-07     0   5    -1   2021-01-01
+    ##  8 CentralPark_NY USW00094728 2021-01-08     0   2.8  -2.7 2021-01-01
+    ##  9 CentralPark_NY USW00094728 2021-01-09     0   2.8  -4.3 2021-01-01
+    ## 10 CentralPark_NY USW00094728 2021-01-10     0   5    -1.6 2021-01-01
+    ## # ℹ 3,275 more rows
+
+## counting things
+
+count months/ name observations
+
+``` r
+weather_df %>% 
+  group_by(name, month) %>% 
+  summarize(n_obs = n())
+```
+
+    ## `summarise()` has grouped output by 'name'. You can override using the
+    ## `.groups` argument.
+
+    ## # A tibble: 108 × 3
+    ## # Groups:   name [3]
+    ##    name           month      n_obs
+    ##    <chr>          <date>     <int>
+    ##  1 CentralPark_NY 2021-01-01    31
+    ##  2 CentralPark_NY 2021-02-01    28
+    ##  3 CentralPark_NY 2021-03-01    31
+    ##  4 CentralPark_NY 2021-04-01    30
+    ##  5 CentralPark_NY 2021-05-01    31
+    ##  6 CentralPark_NY 2021-06-01    30
+    ##  7 CentralPark_NY 2021-07-01    31
+    ##  8 CentralPark_NY 2021-08-01    31
+    ##  9 CentralPark_NY 2021-09-01    30
+    ## 10 CentralPark_NY 2021-10-01    31
+    ## # ℹ 98 more rows
+
+n(): count the number
+
+we can use ‘count()’
+
+``` r
+weather_df %>% 
+  count(name, month, name = "n_obs")
+```
+
+    ## # A tibble: 108 × 3
+    ##    name           month      n_obs
+    ##    <chr>          <date>     <int>
+    ##  1 CentralPark_NY 2021-01-01    31
+    ##  2 CentralPark_NY 2021-02-01    28
+    ##  3 CentralPark_NY 2021-03-01    31
+    ##  4 CentralPark_NY 2021-04-01    30
+    ##  5 CentralPark_NY 2021-05-01    31
+    ##  6 CentralPark_NY 2021-06-01    30
+    ##  7 CentralPark_NY 2021-07-01    31
+    ##  8 CentralPark_NY 2021-08-01    31
+    ##  9 CentralPark_NY 2021-09-01    30
+    ## 10 CentralPark_NY 2021-10-01    31
+    ## # ℹ 98 more rows
+
+**NEVER** use base R’s `table`
+
+``` r
+weather_df %>% 
+  pull(month) %>% 
+  table()
+```
+
+The result is not a data frame and not helpful
+
+other helpful counters
+
+``` r
+weather_df %>% 
+  group_by(month) %>% 
+  summarize(
+    n_obs = n(),
+    n_days = n_distinct(date))
+```
+
+    ## # A tibble: 36 × 3
+    ##    month      n_obs n_days
+    ##    <date>     <int>  <int>
+    ##  1 2021-01-01    93     31
+    ##  2 2021-02-01    84     28
+    ##  3 2021-03-01    93     31
+    ##  4 2021-04-01    90     30
+    ##  5 2021-05-01    93     31
+    ##  6 2021-06-01    90     30
+    ##  7 2021-07-01    93     31
+    ##  8 2021-08-01    93     31
+    ##  9 2021-09-01    90     30
+    ## 10 2021-10-01    93     31
+    ## # ℹ 26 more rows
+
+n_distince(date): count the number of distinct observations.e.g. in
+2021-01-01, how many distinct days in this month (31).
+
+## A digression on 2\*2 table
+
+``` r
+weather_df %>% 
+  filter(name !="Molokai_HI") %>% 
+  mutate(
+    cold = case_when(
+      tmax <  5 ~ "cold",
+      tmax >= 5 ~ "not cold",
+      TRUE      ~ ""
+    )
+  ) %>% 
+  group_by(name, cold) %>% 
+  summarize(count = n())
+```
+
+    ## `summarise()` has grouped output by 'name'. You can override using the
+    ## `.groups` argument.
+
+    ## # A tibble: 5 × 3
+    ## # Groups:   name [2]
+    ##   name           cold       count
+    ##   <chr>          <chr>      <int>
+    ## 1 CentralPark_NY "cold"       111
+    ## 2 CentralPark_NY "not cold"   984
+    ## 3 Waterhole_WA   ""            18
+    ## 4 Waterhole_WA   "cold"       473
+    ## 5 Waterhole_WA   "not cold"   604
+
+case_when: given this condition use this output level
+
+``` r
+weather_df %>% 
+  filter(name !="Molokai_HI") %>% 
+  mutate(
+    cold = case_when(
+      tmax <  5 ~ "cold",
+      tmax >= 5 ~ "not cold",
+      TRUE      ~ ""
+    )
+  ) %>% 
+  janitor::tabyl(name, cold)
+```
+
+    ##            name cold not cold emptystring_
+    ##  CentralPark_NY  111      984            0
+    ##    Waterhole_WA  473      604           18
