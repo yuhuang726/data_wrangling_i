@@ -187,3 +187,46 @@ weather_df %>%
   knitr::kable(digits = 1)
 ```
 
+
+## `group_by` and `mutate`
+
+```{r, eval= FALSE}
+weather_df %>% 
+  group_by(name) %>% 
+  mutate(
+    mean_tmax = mean(tmax, na.rm = TRUE),
+    centered_tmax = tmax - mean_tmax
+  ) %>% 
+  ggplot(aes(x = date, y = centered_tmax, color = name)) +
+  geom_point()
+```
+
+what about window function
+
+ranking
+
+```{r}
+weather_df %>% 
+  group_by(name, month) %>% 
+  mutate(temp_rank = min_rank(tmax)) %>% 
+  filter(temp_rank == 1)
+```
+
+mutate(temp_rank = min_rank(tmax)): create a new column to rank the tmax from lowest to highest
+filter(temp_rank == 1): only keep the temp_rank = 1(the coldest day in the month since we group_by month and name)
+
+lag
+
+```{r}
+weather_df %>% 
+  group_by(name) %>% 
+  mutate(lag_temp = lag(tmax)) %>% 
+  mutate(temp_change = tmax - lag(tmax)) %>% 
+  summarize(
+    temp_change_max = max(temp_change, na.rm = TRUE),
+    temp_change_sd = sd(temp_change, na.rm = TRUE)
+  )
+```
+
+lag(tmax): copy tmax to log_temp but lag 1
+lag(tmax, 5): lag 5
