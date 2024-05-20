@@ -416,3 +416,7 @@ weather_df %>%
     ## 3 Waterhole_WA              11.1           3.05
 
 lag(tmax): copy tmax to log_temp but lag 1 lag(tmax, 5): lag 5
+
+## Quick note
+
+summarize only gets you so far.
